@@ -1,4 +1,4 @@
-﻿namespace UselessRoles;
+﻿namespace UselessRoles.Roles;
 
 public enum RoleType
 {

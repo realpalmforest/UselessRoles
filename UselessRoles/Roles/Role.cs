@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace UselessRoles;
+namespace UselessRoles.Roles;
 
 public abstract class Role
 {

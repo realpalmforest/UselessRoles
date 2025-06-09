@@ -1,5 +1,4 @@
 ﻿using BepInEx;
-using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Reactor;
@@ -12,15 +11,15 @@ namespace UselessRoles;
 [BepInDependency(ReactorPlugin.Id)]
 public partial class UselessRolesPlugin : BasePlugin
 {
-    public Harmony Harmony { get; } = new(Id);
+    public static UselessRolesPlugin Instance { get; private set; }
 
-    public static Random Random = new Random();
-    public static ManualLogSource Logger { get; private set; }
+    public Harmony Harmony { get; } = new Harmony(Id);
 
+    public Random Random { get; } = new Random();
 
     public override void Load()
     {
-        Logger = BepInEx.Logging.Logger.CreateLogSource("UselessRoles");
+        Instance = this;
 
         Harmony.PatchAll();
     }

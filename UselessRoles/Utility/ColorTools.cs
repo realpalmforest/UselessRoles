@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UselessRoles.Roles;
 
 namespace UselessRoles.Utility;
 
@@ -15,6 +16,6 @@ public static class ColorTools
         { RoleType.Crewmate, Color.cyan.RGBMultiplied(1.3f) },
         { RoleType.Impostor, Color.red },
         { RoleType.Shapeshifter, Color.red.RGBMultiplied(0.65f) },
-        { RoleType.Hunter, ColorTools.FromRGB(219, 161, 26) },
+        { RoleType.Hunter, FromRGB(76, 120, 63) },
     };
 }

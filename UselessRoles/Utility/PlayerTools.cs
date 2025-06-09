@@ -1,4 +1,6 @@
-﻿namespace UselessRoles.Utility;
+﻿using UselessRoles.Roles;
+
+namespace UselessRoles.Utility;
 
 public static class PlayerTools
 {
@@ -11,5 +13,10 @@ public static class PlayerTools
         }
 
         return null;
+    }
+
+    public static Role GetRole(this PlayerControl player)
+    {
+        return RoleManager.Roles[player.PlayerId];
     }
 }
