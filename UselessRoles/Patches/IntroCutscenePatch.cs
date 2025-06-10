@@ -1,12 +1,16 @@
 ﻿using HarmonyLib;
+using UselessRoles.Roles;
+using UselessRoles.Utility;
 
 namespace UselessRoles.Patches;
 
 [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
-public class IntroCutscenePatch
+public static class IntroCutscenePatch
 {
     public static void Prefix(IntroCutscene __instance)
     {
+        ModifyIntroVisuals(__instance);
+
         if (!AmongUsClient.Instance.AmHost)
             return;
 
@@ -21,9 +25,18 @@ public class IntroCutscenePatch
 
             if (!player.AmOwner)
                 continue;
-
-            __instance.RoleText.text = "RoleText";
-            __instance.RoleBlurbText.text = "RoleBlurbText";
         }
+    }
+
+
+    private static void ModifyIntroVisuals(IntroCutscene intro)
+    {
+        Role role = PlayerControl.LocalPlayer.GetRole();
+
+        intro.RoleText.text = role.Name;
+        intro.RoleBlurbText.text = role.Description;
+
+        intro.RoleText.color = role.Color;
+        intro.RoleBlurbText.color = role.Color;
     }
 }
