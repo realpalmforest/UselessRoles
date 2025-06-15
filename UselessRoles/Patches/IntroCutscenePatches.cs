@@ -8,6 +8,7 @@ namespace UselessRoles.Patches;
 internal static class IntroCutscenePatches
 {
     [HarmonyPatch(nameof(IntroCutscene.CoBegin))]
+    [HarmonyPriority(Priority.First)]
     [HarmonyPrefix]
     public static void CutsceneBegin_Prefix()
     {

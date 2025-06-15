@@ -2,6 +2,7 @@
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using Reactor;
+using Reactor.Utilities;
 using System;
 
 namespace UselessRoles;
@@ -21,6 +22,7 @@ public partial class UselessRolesPlugin : BasePlugin
     {
         Instance = this;
 
+        ReactorCredits.Register<UselessRolesPlugin>(ReactorCredits.AlwaysShow);
         Harmony.PatchAll();
     }
 }
