@@ -37,11 +37,11 @@ public static class RoleManager
     public static void AssignRole(PlayerControl player)
     {
         RoleType type = (RoleType)UselessRolesPlugin.Instance.Random.Next(0, 4);
-        RPCSendRole(player, (uint)type);
+        RpcSendRole(player, (uint)type);
     }
 
     [MethodRpc((byte)UselessRpcCalls.AssignRole)]
-    private static void RPCSendRole(PlayerControl player, uint roleType)
+    private static void RpcSendRole(PlayerControl player, uint roleType)
     {
         if (player == null)
             return;

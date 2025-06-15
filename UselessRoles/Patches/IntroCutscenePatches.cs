@@ -7,23 +7,32 @@ namespace UselessRoles.Patches;
 
 public static class IntroCutscenePatches
 {
-    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CoBegin))]
-    public static class IntroBeginPatch
+    [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.SelectTeamToShow))]
+    public static class SelectTeamatesPatch
     {
-        public static void Prefix(IntroCutscene __instance)
+        public static void Postfix(ref Il2CppSystem.Collections.Generic.List<PlayerControl> __result)
         {
-            if (!AmongUsClient.Instance.AmHost)
-                return;
+            var sameTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
 
-            var players = PlayerControl.AllPlayerControls;
-
-            if (players.Count == 0)
-                return;
-
-            foreach (var player in players)
+            foreach (var player in GameData.Instance.AllPlayers)
             {
-                RoleManager.AssignRole(player);
+                if (player.Disconnected)
+                    continue;
+
+                var pc = player.Object;
+                if (pc == null) continue;
+
+                if (pc == PlayerControl.LocalPlayer)
+                    continue;
+
+                if (pc.GetRole().TeamType == PlayerControl.LocalPlayer.GetRole().TeamType)
+                    sameTeam.Add(pc);
             }
+
+            // Some cutscenes break if the result is empty, so always include local player
+            sameTeam.Add(PlayerControl.LocalPlayer);
+
+            __result = sameTeam;
         }
     }
 
