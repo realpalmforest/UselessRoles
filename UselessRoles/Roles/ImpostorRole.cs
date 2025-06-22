@@ -2,9 +2,9 @@
 
 namespace UselessRoles.Roles;
 
-public class Impostor : Role
+public class ImpostorRole : Role
 {
-    public Impostor()
+    public ImpostorRole()
     {
         Name = "Impostor";
         Description = "Kill all the crewmates without getting voted out";

@@ -18,6 +18,20 @@ public abstract class Role
     {
     }
 
+    public virtual void OnHudStart(HudManager hud)
+    {
+        if (TeamType == TeamType.Impostor)
+        {
+            KillButton killBtn = Object.Instantiate(hud.KillButton, hud.KillButton.transform.parent);
+            killBtn.graphic.enabled = true;
+            killBtn.gameObject.SetActive(true);
+
+            VentButton ventBtn = Object.Instantiate(hud.ImpostorVentButton, hud.ImpostorVentButton.transform.parent);
+            ventBtn.graphic.enabled = true;
+            ventBtn.gameObject.SetActive(true);
+        }
+    }
+
     public virtual void OnMeeting()
     {
     }

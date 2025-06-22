@@ -2,9 +2,9 @@
 
 namespace UselessRoles.Roles;
 
-public class Crewmate : Role
+public class CrewmateRole : Role
 {
-    public Crewmate()
+    public CrewmateRole()
     {
         Name = "Crewmate";
         Description = "Complete your tasks and discover the impostors";

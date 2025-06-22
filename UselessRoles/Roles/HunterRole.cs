@@ -2,9 +2,9 @@
 
 namespace UselessRoles.Roles;
 
-public class Hunter : Role
+public class HunterRole : Role
 {
-    public Hunter()
+    public HunterRole()
     {
         Name = "Hunter";
         Description = "Use various traps to hunt down the impostors";

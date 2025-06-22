@@ -1,4 +1,5 @@
 ﻿using Reactor.Networking.Attributes;
+using Reactor.Networking.Rpc;
 using Reactor.Utilities;
 using System.Collections.Generic;
 using UselessRoles.Network;
@@ -15,10 +16,10 @@ public static class RoleManager
     {
         Role role = roleType switch
         {
-            RoleType.Crewmate => new Crewmate(),
-            RoleType.Impostor => new Impostor(),
-            RoleType.Shapeshifter => new Shapeshifter(),
-            RoleType.Hunter => new Hunter()
+            RoleType.Crewmate => new Roles.CrewmateRole(),
+            RoleType.Impostor => new Roles.ImpostorRole(),
+            RoleType.Shapeshifter => new Roles.ShapeshifterRole(),
+            RoleType.Hunter => new HunterRole()
         };
 
         role.Player = player;

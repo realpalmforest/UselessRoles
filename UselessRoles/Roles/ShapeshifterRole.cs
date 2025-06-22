@@ -2,9 +2,9 @@
 
 namespace UselessRoles.Roles;
 
-public class Shapeshifter : Role
+public class ShapeshifterRole : Role
 {
-    public Shapeshifter()
+    public ShapeshifterRole()
     {
         Name = "Shapeshifter";
         Description = "Take on the form of crewmates and kill";
