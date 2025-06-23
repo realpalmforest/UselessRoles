@@ -16,10 +16,11 @@ public static class RoleManager
     {
         Role role = roleType switch
         {
-            RoleType.Crewmate => new Roles.CrewmateRole(),
-            RoleType.Impostor => new Roles.ImpostorRole(),
-            RoleType.Shapeshifter => new Roles.ShapeshifterRole(),
-            RoleType.Hunter => new HunterRole()
+            //RoleType.Crewmate => new Roles.CrewmateRole(),
+            //RoleType.Impostor => new Roles.ImpostorRole(),
+            //RoleType.Shapeshifter => new Roles.ShapeshifterRole(),
+            //RoleType.Hunter => new HunterRole(),
+            _ => new HunterRole()
         };
 
         role.Player = player;
@@ -27,7 +28,7 @@ public static class RoleManager
 
         if (player == PlayerControl.LocalPlayer)
         {
-            player.cosmetics.SetNameColor(ColorTools.RoleColors[roleType]);
+            player.cosmetics.SetNameColor(ColorTools.RoleColors[role.RoleType]);
             player.cosmetics.SetName($"{player.name}\n{role.Name}");
         }
 
