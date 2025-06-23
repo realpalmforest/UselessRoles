@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using Reactor.Utilities;
 using UselessRoles.Buttons;
 using UselessRoles.Utility;
 
@@ -6,7 +6,7 @@ namespace UselessRoles.Roles;
 
 public class HunterRole : Role
 {
-    public TrapButton TrapButton;
+    public RoleActionButton TrapButton;
 
     public HunterRole()
     {
@@ -22,10 +22,12 @@ public class HunterRole : Role
     {
         base.OnHudStart(hud);
 
-        var button = GameObject.Instantiate(hud.AbilityButton.gameObject, hud.AbilityButton.transform.parent);
-        button.SetActive(true);
-
-        GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
-        TrapButton = button.AddComponent<TrapButton>();
+        TrapButton = RoleActionButton.Create<RoleActionButton>(hud);
+        TrapButton.name = "TrapButton";
+        TrapButton.buttonLabelText.text = "Trap";
+        TrapButton.OnClickEvent += (_, _) =>
+        {
+            Logger<UselessRolesPlugin>.Message("Wowee you pressed the TRAP BUTTON !!! :D");
+        };
     }
 }

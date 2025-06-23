@@ -1,4 +1,5 @@
-﻿using Reactor.Utilities.Attributes;
+﻿using System;
+using Reactor.Utilities.Attributes;
 using TMPro;
 using UnityEngine;
 
@@ -14,6 +15,8 @@ public class RoleActionButton : ActionButton
 
     //public float defaultfillUpTime = 2;
     //public float fillUpTime = 2;
+
+    public event EventHandler OnClickEvent;
 
     public virtual void Awake()
     {
@@ -41,6 +44,8 @@ public class RoleActionButton : ActionButton
         UsesRemaining--;
         Cooldown = DefaultCooldown;
         isCoolingDown = true;
+
+        OnClickEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public virtual void FixedUpdate()
@@ -58,5 +63,14 @@ public class RoleActionButton : ActionButton
 
         base.SetCoolDown(Cooldown, DefaultCooldown);
         base.SetUsesRemaining(UsesRemaining);
+    }
+
+    public static T Create<T>(HudManager hud) where T : RoleActionButton
+    {
+        var button = GameObject.Instantiate(hud.AbilityButton.gameObject, hud.AbilityButton.transform.parent);
+        button.SetActive(true);
+
+        GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
+        return button.AddComponent<T>();
     }
 }
