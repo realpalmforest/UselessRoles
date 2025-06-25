@@ -1,6 +1,5 @@
-﻿using System;
-using Reactor.Utilities;
-using Reactor.Utilities.Attributes;
+﻿using Reactor.Utilities.Attributes;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -10,8 +9,12 @@ namespace UselessRoles.Buttons;
 [RegisterInIl2Cpp]
 public class RoleActionButton : ActionButton
 {
-    public HudManager Hud;
     public PassiveButton PButton;
+
+    public event EventHandler OnClickEvent;
+
+    public float DefaultCooldown = 10f;
+    public float Cooldown = 10f;
 
     public int UsesRemaining
     {
@@ -20,25 +23,29 @@ public class RoleActionButton : ActionButton
         {
             _usesRemaining = Math.Max(0, value);
             base.SetUsesRemaining(_usesRemaining);
-
-            if (_usesRemaining == 0)
-                base.SetDisabled();
         }
     }
 
-    public float DefaultCooldown = 10f;
-    public float Cooldown = 10f;
+    public bool InfiniteUses
+    {
+        get => _infiniteUses;
+        set
+        {
+            _infiniteUses = value;
 
-    //public float defaultfillUpTime = 2;
-    //public float fillUpTime = 2;
+            this.usesRemainingText.gameObject.SetActive(!value);
+            this.usesRemainingSprite.gameObject.SetActive(!value);
+        }
+    }
 
-    public event EventHandler OnClickEvent;
-
+    private bool _infiniteUses = false;
     private int _usesRemaining = 3;
 
     public virtual void Awake()
     {
         base.graphic = this.GetComponentInChildren<SpriteRenderer>();
+        base.graphic.SetCooldownNormalizedUvs();
+
         base.glyph = this.transform.FindChild("Ability").FindChild("InputDisplayGlyph").GetComponent<ActionMapGlyphDisplay>();
 
         base.buttonLabelText = this.transform.FindChild("Ability").FindChild("Text_TMP").GetComponent<TextMeshPro>();
@@ -51,7 +58,7 @@ public class RoleActionButton : ActionButton
 
         PButton = this.GetComponent<PassiveButton>();
         PButton.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-        PButton.OnClick.AddListener((UnityAction)DoClick); 
+        PButton.OnClick.AddListener((UnityAction)DoClick);
     }
 
     public override void DoClick()
@@ -60,41 +67,42 @@ public class RoleActionButton : ActionButton
             return;
         if (!PlayerControl.LocalPlayer)
             return;
-        if (Hud.IsIntroDisplayed)
+        if (HudManager.Instance.IsIntroDisplayed)
+            return;
+        if (isCoolingDown)
+            return;
+        if (!canInteract)
             return;
 
-        UsesRemaining--;
+        if (!InfiniteUses)
+            UsesRemaining--;
+
         Cooldown = DefaultCooldown;
-        isCoolingDown = true;
 
         OnClickEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public virtual void FixedUpdate()
     {
-        if (isCoolingDown)
+        if (Cooldown > 0f)
         {
-            Cooldown -= Time.deltaTime;
+            Cooldown -= Time.fixedDeltaTime;
 
-            if (Cooldown <= 0f)
-            {
-                Cooldown = 0f;
-                base.ResetCoolDown();
-            }
+            Cooldown = Math.Clamp(Cooldown, 0f, DefaultCooldown);
+            base.SetCoolDown(Cooldown, DefaultCooldown);
         }
 
-        base.SetCoolDown(Cooldown, DefaultCooldown);
+        if ((UsesRemaining <= 0 && !InfiniteUses) || isCoolingDown)
+            base.SetDisabled();
+        else base.SetEnabled();
     }
 
-    public static T Create<T>(HudManager hud) where T : RoleActionButton
+    public static T Create<T>() where T : RoleActionButton
     {
-        var button = GameObject.Instantiate(hud.AbilityButton.gameObject, hud.AbilityButton.transform.parent);
+        var button = GameObject.Instantiate(HudManager.Instance.AbilityButton.gameObject, HudManager.Instance.AbilityButton.transform.parent);
         button.SetActive(true);
 
         GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
-        T btn = button.AddComponent<T>();
-        btn.Hud = hud;
-
-        return btn;
+        return button.AddComponent<T>();
     }
 }

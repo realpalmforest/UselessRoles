@@ -22,9 +22,10 @@ public class HunterRole : Role
     {
         base.OnHudStart(hud);
 
-        TrapButton = RoleActionButton.Create<RoleActionButton>(hud);
+        TrapButton = RoleActionButton.Create<RoleActionButton>();
         TrapButton.name = "TrapButton";
         TrapButton.buttonLabelText.text = "Trap";
+        TrapButton.InfiniteUses = true;
         TrapButton.OnClickEvent += (_, _) =>
         {
             Logger<UselessRolesPlugin>.Message("Wowee you pressed the TRAP BUTTON !!! :D");
