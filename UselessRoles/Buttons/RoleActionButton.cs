@@ -1,14 +1,30 @@
 ﻿using System;
+using Reactor.Utilities;
 using Reactor.Utilities.Attributes;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace UselessRoles.Buttons;
 
 [RegisterInIl2Cpp]
 public class RoleActionButton : ActionButton
 {
-    public int UsesRemaining = 3;
+    public HudManager Hud;
+    public PassiveButton PButton;
+
+    public int UsesRemaining
+    {
+        get => _usesRemaining;
+        set
+        {
+            _usesRemaining = Math.Max(0, value);
+            base.SetUsesRemaining(_usesRemaining);
+
+            if (_usesRemaining == 0)
+                base.SetDisabled();
+        }
+    }
 
     public float DefaultCooldown = 10f;
     public float Cooldown = 10f;
@@ -18,10 +34,12 @@ public class RoleActionButton : ActionButton
 
     public event EventHandler OnClickEvent;
 
+    private int _usesRemaining = 3;
+
     public virtual void Awake()
     {
         base.graphic = this.GetComponentInChildren<SpriteRenderer>();
-        base.glyph = this.transform.FindChild("Ability").GetComponentInChildren<ActionMapGlyphDisplay>();
+        base.glyph = this.transform.FindChild("Ability").FindChild("InputDisplayGlyph").GetComponent<ActionMapGlyphDisplay>();
 
         base.buttonLabelText = this.transform.FindChild("Ability").FindChild("Text_TMP").GetComponent<TextMeshPro>();
         base.cooldownTimerText = this.transform.FindChild("Ability").FindChild("CooldownTimer_TMP").GetComponent<TextMeshPro>();
@@ -30,6 +48,10 @@ public class RoleActionButton : ActionButton
         base.usesRemainingSprite = this.transform.FindChild("Uses").GetComponent<SpriteRenderer>();
 
         base.name = "RoleActionButton";
+
+        PButton = this.GetComponent<PassiveButton>();
+        PButton.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+        PButton.OnClick.AddListener((UnityAction)DoClick); 
     }
 
     public override void DoClick()
@@ -38,7 +60,7 @@ public class RoleActionButton : ActionButton
             return;
         if (!PlayerControl.LocalPlayer)
             return;
-        if (!LobbyBehaviour.Instance)
+        if (Hud.IsIntroDisplayed)
             return;
 
         UsesRemaining--;
@@ -62,7 +84,6 @@ public class RoleActionButton : ActionButton
         }
 
         base.SetCoolDown(Cooldown, DefaultCooldown);
-        base.SetUsesRemaining(UsesRemaining);
     }
 
     public static T Create<T>(HudManager hud) where T : RoleActionButton
@@ -71,6 +92,9 @@ public class RoleActionButton : ActionButton
         button.SetActive(true);
 
         GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
-        return button.AddComponent<T>();
+        T btn = button.AddComponent<T>();
+        btn.Hud = hud;
+
+        return btn;
     }
 }
