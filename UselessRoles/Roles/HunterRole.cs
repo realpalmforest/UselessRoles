@@ -27,7 +27,6 @@ public class HunterRole : Role
 
         TrapButton.SetText("Trap", Color);
         TrapButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Trap.png");
-        TrapButton.graphic.SetCooldownNormalizedUvs();
 
         TrapButton.InfiniteUses = true;
         TrapButton.OnClickEvent += (_, _) =>

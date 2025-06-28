@@ -1,30 +1,43 @@
 ﻿using UnityEngine;
 using UselessRoles.Buttons;
+using UselessRoles.Utility;
 
 namespace UselessRoles.Roles;
 
 public abstract class Role
 {
-    public string Name { get; protected init; }
-    public string Description { get; protected init; }
-
-    public Color Color { get; protected init; }
+    public PlayerControl Player { get; set; }
 
     public RoleType RoleType { get; protected init; }
     public TeamType TeamType { get; protected init; }
 
-    public PlayerControl Player { get; set; }
+    public Color Color { get; protected init; }
+
+    public string Name { get; protected init; }
+    public string Description { get; protected init; }
 
     public virtual void OnAssign()
     {
+        if (TeamType == TeamType.Impostor)
+        {
+            foreach (var player in PlayerControl.AllPlayerControls)
+            {
+                if (player.GetRole().TeamType == TeamType)
+                    player.ShowRoleUnderName();
+            }
+        }
     }
 
     public virtual void OnHudStart(HudManager hud)
     {
+
     }
 
     public virtual void OnHudActive(HudManager hud, bool isActive)
     {
+        if (Player.Data.IsDead)
+            return;
+
         // Show / Hide the buttons when the Hud's active state changes
         foreach (var button in hud.transform.FindChild("Buttons").FindChild("BottomRight").GetComponentsInChildren<RoleActionButton>())
         {
@@ -40,5 +53,17 @@ public abstract class Role
 
     public virtual void OnMeetingEnd(MeetingHud meeting)
     {
+    }
+
+    public virtual void OnKilled(PlayerControl murderer)
+    {
+        // Hide all modded buttons on death
+        foreach (var button in HudManager.Instance.transform.FindChild("Buttons").FindChild("BottomRight").GetComponentsInChildren<RoleActionButton>())
+        {
+            button.Hide();
+        }
+
+        Player.cosmetics.SetName(Player.Data.PlayerName);
+        Player.cosmetics.SetNameColor(Color.white);
     }
 }

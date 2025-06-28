@@ -44,7 +44,6 @@ public class RoleActionButton : ActionButton
     public virtual void Awake()
     {
         base.graphic = this.GetComponentInChildren<SpriteRenderer>();
-
         base.glyph = this.transform.FindChild("Ability").FindChild("InputDisplayGlyph").GetComponent<ActionMapGlyphDisplay>();
 
         base.buttonLabelText = this.transform.FindChild("Ability").FindChild("Text_TMP").GetComponent<TextMeshPro>();

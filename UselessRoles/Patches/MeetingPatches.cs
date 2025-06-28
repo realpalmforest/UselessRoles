@@ -10,19 +10,21 @@ internal static class MeetingPatches
     [HarmonyPrefix]
     public static void MeetingStart_Prefix(MeetingHud __instance)
     {
+        if (!AmongUsClient.Instance.AmHost)
+            return;
+
         foreach (var player in PlayerControl.AllPlayerControls)
-        {
             player.GetRole().OnMeetingStart(__instance);
-        }
     }
 
     [HarmonyPatch(nameof(MeetingHud.OnDestroy))]
     [HarmonyPostfix]
     public static void MeetingEnd_Postfix(MeetingHud __instance)
     {
+        if (!AmongUsClient.Instance.AmHost)
+            return;
+
         foreach (var player in PlayerControl.AllPlayerControls)
-        {
             player.GetRole().OnMeetingEnd(__instance);
-        }
     }
 }

@@ -23,6 +23,14 @@ public static class PlayerTools
         return RoleManager.Roles[player.PlayerId];
     }
 
+    public static void ShowRoleUnderName(this PlayerControl player)
+    {
+        Role role = player.GetRole();
+
+        player.cosmetics.SetNameColor(ColorTools.RoleColors[role.RoleType]);
+        player.cosmetics.SetName($"{player.name}\n{role.Name}");
+    }
+
     public static PlayerControl FindClosestPlayer(this PlayerControl player, Func<PlayerControl, bool> predicate)
     {
         var players = PlayerControl.AllPlayerControls

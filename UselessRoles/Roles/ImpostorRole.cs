@@ -31,7 +31,6 @@ public class ImpostorRole : Role
         KillButton.SetText("Kill", Color);
         KillButton.graphic.sprite = hud.KillButton.graphic.sprite;
 
-
         KillButton.InfiniteUses = true;
         KillButton.ValidTargets = (player => player.GetRole().TeamType != this.TeamType && !player.Data.IsDead);
         KillButton.OnClickEvent += (_, _) => PlayerControl.LocalPlayer.RpcMurderPlayer(KillButton.Target, true);
