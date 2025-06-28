@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UselessRoles.Buttons;
 
 namespace UselessRoles.Roles;
 
@@ -20,23 +21,24 @@ public abstract class Role
 
     public virtual void OnHudStart(HudManager hud)
     {
-        if (TeamType == TeamType.Impostor)
-        {
-            KillButton killBtn = Object.Instantiate(hud.KillButton, hud.KillButton.transform.parent);
-            killBtn.graphic.enabled = true;
-            killBtn.gameObject.SetActive(true);
+    }
 
-            VentButton ventBtn = Object.Instantiate(hud.ImpostorVentButton, hud.ImpostorVentButton.transform.parent);
-            ventBtn.graphic.enabled = true;
-            ventBtn.gameObject.SetActive(true);
+    public virtual void OnHudActive(HudManager hud, bool isActive)
+    {
+        // Show / Hide the buttons when the Hud's active state changes
+        foreach (var button in hud.transform.FindChild("Buttons").FindChild("BottomRight").GetComponentsInChildren<RoleActionButton>())
+        {
+            if (isActive)
+                button.Show();
+            else button.Hide();
         }
     }
 
-    public virtual void OnMeeting()
+    public virtual void OnMeetingStart(MeetingHud meeting)
     {
     }
 
-    public virtual void OnGameEnd()
+    public virtual void OnMeetingEnd(MeetingHud meeting)
     {
     }
 }

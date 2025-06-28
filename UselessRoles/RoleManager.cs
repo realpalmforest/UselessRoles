@@ -16,11 +16,11 @@ public static class RoleManager
     {
         Role role = roleType switch
         {
-            //RoleType.Crewmate => new Roles.CrewmateRole(),
-            //RoleType.Impostor => new Roles.ImpostorRole(),
-            //RoleType.Shapeshifter => new Roles.ShapeshifterRole(),
-            //RoleType.Hunter => new HunterRole(),
-            _ => new HunterRole()
+            RoleType.Impostor => new Roles.ImpostorRole(),
+            RoleType.Shapeshifter => new Roles.ShapeshifterRole(),
+            RoleType.Hunter => new Roles.HunterRole(),
+
+            _ => new Roles.CrewmateRole()
         };
 
         role.Player = player;
@@ -38,7 +38,13 @@ public static class RoleManager
 
     public static void AssignRole(PlayerControl player)
     {
-        RoleType type = (RoleType)UselessRolesPlugin.Instance.Random.Next(0, 4);
+        RoleType type;
+
+        if (player.PlayerId == 0)
+            type = RoleType.Impostor;
+        else type = RoleType.Hunter;
+
+        //RoleType type = (RoleType)Random.Shared.Next(0, 4);
         RpcSendRole(player, (uint)type);
     }
 

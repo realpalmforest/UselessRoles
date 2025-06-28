@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UselessRoles.Roles;
@@ -22,13 +21,6 @@ public static class PlayerTools
     public static Role GetRole(this PlayerControl player)
     {
         return RoleManager.Roles[player.PlayerId];
-    }
-
-    public static void SetOutlineColor(this PlayerControl player, Color? color)
-    {
-        if(color.HasValue)
-            player.cosmetics.SetOutline(true, new Il2CppSystem.Nullable<Color>(color.Value));
-        else player.cosmetics.SetOutline(false, null);
     }
 
     public static PlayerControl FindClosestPlayer(this PlayerControl player, Func<PlayerControl, bool> predicate)
@@ -54,8 +46,8 @@ public static class PlayerTools
             }
             return 0;
         });
-        
-        if(players.Count > 0)
+
+        if (players.Count > 0)
             return players[0];
 
         return null;

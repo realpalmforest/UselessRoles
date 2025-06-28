@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Reactor.Utilities;
+﻿using Reactor.Utilities;
 using Reactor.Utilities.Attributes;
+using System;
 using UnityEngine;
 using UselessRoles.Utility;
-using static UnityEngine.GraphicsBuffer;
 
 namespace UselessRoles.Buttons;
 
 [RegisterInIl2Cpp]
 public class RoleTargetButton : RoleActionButton
 {
-    public float UseRange = 50f;
+    public float UseRange = 1.5f;
     public Func<PlayerControl, bool> ValidTargets;
 
     public Color HighlightColor = Color.red;
@@ -26,25 +21,37 @@ public class RoleTargetButton : RoleActionButton
         {
             if (!PlayerControl.LocalPlayer || PlayerControl.LocalPlayer.Data == null || !PlayerControl.LocalPlayer.Data.Role)
                 return;
+            if (!canInteract || isCoolingDown)
+                return;
+            if (!value)
+                return;
 
-            _target = value;
 
-            if (_target)
-            {
-                _target.SetOutlineColor(HighlightColor);
+            // Calculate the distance to the new target
+            float distance = Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(), value.GetTruePosition());
+
+            // If the new target is too far away, make the new target null
+            if (distance > UseRange)
+                value = null;
+            // If the new target is the same as before, return
+            else if (value == _target)
+                return;
+
+            // If there is a new target and the button is cooled down, enable the button
+            if (value != null && base.canInteract && !base.isCoolingDown)
                 base.SetEnabled();
-            }
-            else
-            {
-                _target.SetOutlineColor(null);
-                base.SetDisabled();
-            }
+            else base.SetDisabled();
 
-            Logger<UselessRolesPlugin>.Message($"Target of {this.GetType().FullName} set to {_target.name}");
+            // Update outline and old target
+            UpdateOutline(value, _target);
+            _target = value;
         }
     }
 
-    public override void FixedUpdate()
+    private PlayerControl _target;
+
+
+    public new void FixedUpdate()
     {
         base.FixedUpdate();
 
@@ -52,11 +59,19 @@ public class RoleTargetButton : RoleActionButton
         {
             Target = PlayerControl.LocalPlayer.FindClosestPlayer(ValidTargets);
         }
-        catch (Exception ex) when (ex is NullReferenceException)
+        catch (Exception ex) when (ex is ArgumentNullException)
         {
             Logger<UselessRolesPlugin>.Error($"{ex.Message}\nNo predicate provided for ValidTargets of {this.GetType().FullName}");
         }
     }
 
-    private PlayerControl _target;
+    private void UpdateOutline(PlayerControl newTarget, PlayerControl oldTarget)
+    {
+        // If there is an old target, remove its outline
+        if (oldTarget)
+            oldTarget.cosmetics.SetOutline(false, new Il2CppSystem.Nullable<Color>(HighlightColor));
+        // If the button is cooled down and there is a new target, give it an outline
+        if (newTarget && base.canInteract && !base.isCoolingDown)
+            newTarget.cosmetics.SetOutline(true, new Il2CppSystem.Nullable<Color>(HighlightColor));
+    }
 }

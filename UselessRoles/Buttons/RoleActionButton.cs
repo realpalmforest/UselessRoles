@@ -44,7 +44,6 @@ public class RoleActionButton : ActionButton
     public virtual void Awake()
     {
         base.graphic = this.GetComponentInChildren<SpriteRenderer>();
-        base.graphic.SetCooldownNormalizedUvs();
 
         base.glyph = this.transform.FindChild("Ability").FindChild("InputDisplayGlyph").GetComponent<ActionMapGlyphDisplay>();
 
@@ -82,7 +81,7 @@ public class RoleActionButton : ActionButton
         OnClickEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    public virtual void FixedUpdate()
+    public void FixedUpdate()
     {
         if (Cooldown > 0f)
         {
@@ -95,6 +94,14 @@ public class RoleActionButton : ActionButton
         if ((UsesRemaining <= 0 && !InfiniteUses) || isCoolingDown)
             base.SetDisabled();
         else base.SetEnabled();
+    }
+
+    public void SetText(string text, Color? color)
+    {
+        buttonLabelText.text = text;
+
+        // buttonLabelText.faceColor = color ?? Color.black;
+        buttonLabelText.outlineColor = color ?? Color.black;
     }
 
     public static T Create<T>() where T : RoleActionButton

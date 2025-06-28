@@ -24,7 +24,11 @@ public class HunterRole : Role
 
         TrapButton = RoleActionButton.Create<RoleActionButton>();
         TrapButton.name = "TrapButton";
-        TrapButton.buttonLabelText.text = "Trap";
+
+        TrapButton.SetText("Trap", Color);
+        TrapButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Trap.png");
+        TrapButton.graphic.SetCooldownNormalizedUvs();
+
         TrapButton.InfiniteUses = true;
         TrapButton.OnClickEvent += (_, _) =>
         {

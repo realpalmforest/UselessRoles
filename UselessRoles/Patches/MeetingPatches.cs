@@ -1,0 +1,28 @@
+﻿using HarmonyLib;
+using UselessRoles.Utility;
+
+namespace UselessRoles.Patches;
+
+[HarmonyPatch(typeof(MeetingHud))]
+internal static class MeetingPatches
+{
+    [HarmonyPatch(nameof(MeetingHud.Awake))]
+    [HarmonyPrefix]
+    public static void MeetingStart_Prefix(MeetingHud __instance)
+    {
+        foreach (var player in PlayerControl.AllPlayerControls)
+        {
+            player.GetRole().OnMeetingStart(__instance);
+        }
+    }
+
+    [HarmonyPatch(nameof(MeetingHud.OnDestroy))]
+    [HarmonyPostfix]
+    public static void MeetingEnd_Postfix(MeetingHud __instance)
+    {
+        foreach (var player in PlayerControl.AllPlayerControls)
+        {
+            player.GetRole().OnMeetingEnd(__instance);
+        }
+    }
+}
