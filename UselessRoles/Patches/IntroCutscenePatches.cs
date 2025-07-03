@@ -1,5 +1,4 @@
-﻿using HarmonyLib;
-using UselessRoles.Roles;
+﻿using UselessRoles.Roles;
 using UselessRoles.Utility;
 
 namespace UselessRoles.Patches;

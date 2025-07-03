@@ -1,6 +1,4 @@
-﻿using HarmonyLib;
-
-namespace UselessRoles.Patches;
+﻿namespace UselessRoles.Patches;
 
 [HarmonyPatch]
 [HarmonyPriority(Priority.First)]
