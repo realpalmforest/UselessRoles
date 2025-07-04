@@ -8,14 +8,13 @@ namespace UselessRoles;
 
 public static class RoleManager
 {
-    public static Dictionary<byte, Role> Roles = new Dictionary<byte, Role>();
+    public static readonly Dictionary<byte, Role> Roles = new Dictionary<byte, Role>();
 
     private static void SetPlayerRole(PlayerControl player, RoleType roleType)
     {
         Role role = roleType switch
         {
             RoleType.Impostor => new Roles.ImpostorRole(),
-            RoleType.Shapeshifter => new Roles.ShapeshifterRole(),
             RoleType.Hunter => new Roles.HunterRole(),
 
             _ => new Roles.CrewmateRole()
@@ -29,12 +28,7 @@ public static class RoleManager
 
     public static void AssignRole(PlayerControl player)
     {
-        RoleType type;
-
-        if (player.PlayerId == 0)
-            type = RoleType.Impostor;
-        else type = RoleType.Hunter;
-
+        var type = player.PlayerId == 0 ? RoleType.Impostor : RoleType.Hunter;
         //RoleType type = (RoleType)Random.Shared.Next(0, 4);
         RpcSetRole(player, (uint)type);
     }

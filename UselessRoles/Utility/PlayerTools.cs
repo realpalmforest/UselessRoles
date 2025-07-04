@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UselessRoles.Roles;
@@ -25,7 +27,7 @@ public static class PlayerTools
 
     public static void ShowRoleUnderName(this PlayerControl player)
     {
-        Role role = player.GetRole();
+        var role = player.GetRole();
 
         player.cosmetics.SetNameColor(ColorTools.RoleColors[role.RoleType]);
         player.cosmetics.SetName($"{player.name}\n{role.Name}");
@@ -55,9 +57,21 @@ public static class PlayerTools
             return 0;
         });
 
-        if (players.Count > 0)
-            return players[0];
+        return players.Count > 0 ? players[0] : null;
+    }
+    
+    public static bool Am(TeamType team) => PlayerControl.LocalPlayer.GetRole().TeamType == team;
 
-        return null;
+    public static List<PlayerControl> GetTeamPlayers(TeamType team)
+    {
+        var players = new List<PlayerControl>();
+        
+        foreach (var player in PlayerControl.AllPlayerControls)
+        {
+            if(player.GetRole().TeamType == team)
+                players.Add(player);
+        }
+        
+        return players;
     }
 }

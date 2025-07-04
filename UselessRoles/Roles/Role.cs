@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UselessRoles.Buttons;
 using UselessRoles.Utility;
 
@@ -39,7 +40,7 @@ public abstract class Role
             return;
 
         // Show / Hide the buttons when the Hud's active state changes
-        foreach (var button in hud.transform.FindChild("Buttons").FindChild("BottomRight").GetComponentsInChildren<RoleActionButton>())
+        foreach (RoleActionButton button in GetButtons())
         {
             if (isActive)
                 button.Show();
@@ -53,17 +54,36 @@ public abstract class Role
 
     public virtual void OnMeetingEnd(MeetingHud meeting)
     {
+        foreach (RoleActionButton button in GetButtons())
+        {
+            button.Cooldown = button.MeetingCooldown;
+        }
     }
 
     public virtual void OnKilled(PlayerControl murderer)
     {
         // Hide all modded buttons on death
-        foreach (var button in HudManager.Instance.transform.FindChild("Buttons").FindChild("BottomRight").GetComponentsInChildren<RoleActionButton>())
+        foreach (RoleActionButton button in GetButtons())
         {
             button.Hide();
         }
 
         Player.cosmetics.SetName(Player.Data.PlayerName);
         Player.cosmetics.SetNameColor(Color.white);
+    }
+    
+    
+    public IEnumerable GetButtons()
+    {
+        Transform buttonContainer = HudManager.Instance.transform.FindChild("Buttons").FindChild("BottomRight");
+        for (int i = 0; i < buttonContainer.childCount; i++)
+        {
+            GameObject button = buttonContainer.GetChild(i).gameObject;
+
+            if (button.TryGetComponent<RoleActionButton>(out var roleButton))
+            {
+                yield return roleButton;
+            }
+        }
     }
 }

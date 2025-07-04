@@ -9,10 +9,10 @@ namespace UselessRoles.Buttons;
 [RegisterInIl2Cpp]
 public class RoleActionButton : ActionButton
 {
-    public PassiveButton PButton;
-
     public event EventHandler OnClickEvent;
+    public event EventHandler OnFixedUpdateEvent;
 
+    public float MeetingCooldown = 10f;
     public float DefaultCooldown = 10f;
     public float Cooldown = 10f;
 
@@ -38,9 +38,11 @@ public class RoleActionButton : ActionButton
         }
     }
 
-    private bool _infiniteUses = false;
+    private bool _infiniteUses;
     private int _usesRemaining = 3;
 
+    protected PassiveButton passiveButton;
+    
     public virtual void Awake()
     {
         base.graphic = this.GetComponentInChildren<SpriteRenderer>();
@@ -52,11 +54,11 @@ public class RoleActionButton : ActionButton
 
         base.usesRemainingSprite = this.transform.FindChild("Uses").GetComponent<SpriteRenderer>();
 
-        base.name = "RoleActionButton";
+        passiveButton = this.GetComponent<PassiveButton>();
+        passiveButton.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+        passiveButton.OnClick.AddListener((UnityAction)DoClick);
 
-        PButton = this.GetComponent<PassiveButton>();
-        PButton.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-        PButton.OnClick.AddListener((UnityAction)DoClick);
+        InfiniteUses = true;
     }
 
     public override void DoClick()
@@ -80,7 +82,7 @@ public class RoleActionButton : ActionButton
         OnClickEvent?.Invoke(this, EventArgs.Empty);
     }
 
-    public void FixedUpdate()
+    public virtual void FixedUpdate()
     {
         if (Cooldown > 0f)
         {
@@ -93,6 +95,8 @@ public class RoleActionButton : ActionButton
         if ((UsesRemaining <= 0 && !InfiniteUses) || isCoolingDown)
             base.SetDisabled();
         else base.SetEnabled();
+        
+        OnFixedUpdateEvent?.Invoke(this, EventArgs.Empty);
     }
 
     public void SetText(string text, Color? color)
@@ -103,11 +107,21 @@ public class RoleActionButton : ActionButton
         buttonLabelText.outlineColor = color ?? Color.black;
     }
 
-    public static T Create<T>() where T : RoleActionButton
+    public void SetCooldowns(float cooldown, float defaultCooldown, float meetingCooldown)
+    {
+        Cooldown = cooldown;
+        DefaultCooldown = defaultCooldown;
+        MeetingCooldown = meetingCooldown;
+
+        isCoolingDown = cooldown > 0;
+    }
+    
+    public static T Create<T>(string name = "RoleActionButton") where T : RoleActionButton
     {
         var button = GameObject.Instantiate(HudManager.Instance.AbilityButton.gameObject, HudManager.Instance.AbilityButton.transform.parent);
         button.SetActive(true);
-
+        button.name = name;
+        
         GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
         return button.AddComponent<T>();
     }

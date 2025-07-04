@@ -1,4 +1,6 @@
-﻿using UselessRoles.Roles;
+﻿using System.Collections;
+using System.Linq;
+using UselessRoles.Roles;
 using UselessRoles.Utility;
 
 namespace UselessRoles.Patches;
@@ -16,13 +18,9 @@ internal static class IntroCutscenePatches
             // The host assigns roles to everyone
             foreach (var player in PlayerControl.AllPlayerControls)
                 RoleManager.AssignRole(player);
-
-            // The host tells everyone when they've recieved a role
-            foreach (var player in PlayerControl.AllPlayerControls)
-                player.GetRole().OnAssign();
         }
-
-        // Everyone gets to see their own role under their name
+        
+        PlayerControl.LocalPlayer.GetRole().OnAssign();
         PlayerControl.LocalPlayer.ShowRoleUnderName();
     }
 
@@ -37,17 +35,15 @@ internal static class IntroCutscenePatches
             if (player.Disconnected)
                 continue;
 
-            var pc = player.Object;
-            if (pc == null) continue;
-
-            if (pc == PlayerControl.LocalPlayer)
+            var control = player.Object;
+            if (!control || control == PlayerControl.LocalPlayer)
                 continue;
 
-            if (pc.GetRole().TeamType == PlayerControl.LocalPlayer.GetRole().TeamType)
-                sameTeam.Add(pc);
+            if (PlayerTools.Am(control.GetRole().TeamType))
+                sameTeam.Add(control);
         }
 
-        // Some cutscenes break if the result is empty, so always include local player
+        // Local player should be displayed at the front
         sameTeam.Add(PlayerControl.LocalPlayer);
 
         __result = sameTeam;
@@ -58,10 +54,23 @@ internal static class IntroCutscenePatches
     public static void ShowTeamCrewmate_Postfix(IntroCutscene __instance)
     {
         Role role = PlayerControl.LocalPlayer.GetRole();
-
+        
+        // Show the team name 
         __instance.TeamTitle.text = role.TeamType.ToString();
         __instance.TeamTitle.color = ColorTools.TeamColors[role.TeamType];
 
+        // Show impostor count if not impostor
+        if(role.TeamType == TeamType.Impostor)
+            __instance.ImpostorText.gameObject.SetActive(false);
+        else
+        {
+            int impCount = PlayerTools.GetTeamPlayers(TeamType.Impostor).Count;
+            
+            if(impCount == 1)
+                __instance.ImpostorText.text = $"There is <color={ColorTools.TeamColors[TeamType.Impostor].GetHex()}>{impCount} impostor</color> among us";
+            else __instance.ImpostorText.text = $"There are <color={ColorTools.TeamColors[TeamType.Impostor].GetHex()}>{impCount} impostors</color> among us";
+        }
+        
         __instance.BackgroundBar.material.color = ColorTools.TeamColors[role.TeamType];
     }
 

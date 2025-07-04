@@ -1,4 +1,5 @@
-﻿using Reactor.Utilities;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UselessRoles.Buttons;
 using UselessRoles.Utility;
 
@@ -6,6 +7,8 @@ namespace UselessRoles.Roles;
 
 public class HunterRole : Role
 {
+    public static readonly List<Vector2> TrapPositions = new List<Vector2>();
+    
     public RoleActionButton TrapButton;
 
     public HunterRole()
@@ -22,16 +25,16 @@ public class HunterRole : Role
     {
         base.OnHudStart(hud);
 
-        TrapButton = RoleActionButton.Create<RoleActionButton>();
-        TrapButton.name = "TrapButton";
-
+        TrapButton = RoleActionButton.Create<RoleActionButton>("TrapButton");
+        
         TrapButton.SetText("Trap", Color);
         TrapButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Trap.png");
-
-        TrapButton.InfiniteUses = true;
+        
+        TrapButton.DefaultCooldown = 30;
+        TrapButton.MeetingCooldown = 20;
         TrapButton.OnClickEvent += (_, _) =>
         {
-            Logger<UselessRolesPlugin>.Message("Wowee you pressed the TRAP BUTTON !!! :D");
+            TrapPositions.Add(PlayerControl.LocalPlayer.GetTruePosition());
         };
     }
 }

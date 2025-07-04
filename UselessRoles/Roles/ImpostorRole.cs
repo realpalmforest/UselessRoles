@@ -6,6 +6,7 @@ namespace UselessRoles.Roles;
 public class ImpostorRole : Role
 {
     public RoleTargetButton KillButton;
+    public RoleActionButton SabotageButton;
 
     public ImpostorRole()
     {
@@ -19,20 +20,69 @@ public class ImpostorRole : Role
 
     public override void OnHudStart(HudManager hud)
     {
+        CreateSabotageButton(hud);
         CreateKillButton(hud);
         base.OnHudStart(hud);
     }
 
-    private void CreateKillButton(HudManager hud)
+    protected void CreateKillButton(HudManager hud)
     {
-        KillButton = RoleActionButton.Create<RoleTargetButton>();
-        KillButton.name = "KillButton (Mod)";
-
-        KillButton.SetText("Kill", Color);
+        KillButton = RoleActionButton.Create<RoleTargetButton>("KillButton (Mod)");
+        KillButton.SetCooldowns(30, 45, 40);
+        
+        KillButton.SetText(hud.KillButton.buttonLabelText.text, Color);
         KillButton.graphic.sprite = hud.KillButton.graphic.sprite;
-
-        KillButton.InfiniteUses = true;
+        
         KillButton.ValidTargets = (player => player.GetRole().TeamType != this.TeamType && !player.Data.IsDead);
         KillButton.OnClickEvent += (_, _) => PlayerControl.LocalPlayer.RpcMurderPlayer(KillButton.Target, true);
+    }
+    
+    protected void CreateSabotageButton(HudManager hud)
+    {
+        SabotageButton = RoleActionButton.Create<RoleActionButton>("SabotageButton (Mod)");
+        SabotageButton.SetCooldowns(0, 0, 0);
+        
+        SabotageButton.SetText(hud.SabotageButton.buttonLabelText.text, Color);
+        SabotageButton.graphic.sprite = hud.SabotageButton.graphic.sprite;
+        
+        SabotageButton.OnClickEvent += (_, _) =>
+        {
+            if(PlayerControl.LocalPlayer.inVent)
+                return;
+            if(!GameManager.Instance.SabotagesEnabled())
+                return;
+            if(!PlayerTools.Am(TeamType.Impostor))
+                return;
+        
+            HudManager.Instance.ToggleMapVisible(new MapOptions
+            {
+                Mode = MapOptions.Modes.Sabotage
+            });
+            
+            SabotageButton.SetCooldowns(0, 0, 0);
+        };
+        
+        SabotageButton.OnFixedUpdateEvent += (_, _) =>
+        {
+            if (!GameManager.Instance || !PlayerControl.LocalPlayer)
+            {
+                SabotageButton.ToggleVisible(false);
+                SabotageButton.SetDisabled();
+            }
+            else if (PlayerControl.LocalPlayer.inVent || !GameManager.Instance.SabotagesEnabled() || PlayerControl.LocalPlayer.petting)
+            {
+                SabotageButton.ToggleVisible(PlayerTools.Am(TeamType.Impostor) && GameManager.Instance.SabotagesEnabled());
+                SabotageButton.SetDisabled();
+            }
+            else
+            {
+                SabotageButton.SetEnabled();
+            }
+        };
+    }
+    
+    protected void CreateVentButton(HudManager hud)
+    {
+        // do somethig
     }
 }

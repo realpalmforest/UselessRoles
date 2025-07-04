@@ -19,7 +19,7 @@ public class RoleTargetButton : RoleActionButton
         get => _target;
         set
         {
-            if (!PlayerControl.LocalPlayer || PlayerControl.LocalPlayer.Data == null || !PlayerControl.LocalPlayer.Data.Role)
+            if (!PlayerControl.LocalPlayer || !PlayerControl.LocalPlayer.Data || !PlayerControl.LocalPlayer.Data.Role)
                 return;
             if (!canInteract || isCoolingDown)
                 return;
@@ -38,7 +38,7 @@ public class RoleTargetButton : RoleActionButton
                 return;
 
             // If there is a new target and the button is cooled down, enable the button
-            if (value != null && base.canInteract && !base.isCoolingDown)
+            if (value && base.canInteract && !base.isCoolingDown)
                 base.SetEnabled();
             else base.SetDisabled();
 
