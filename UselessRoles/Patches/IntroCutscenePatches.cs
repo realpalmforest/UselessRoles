@@ -64,7 +64,7 @@ internal static class IntroCutscenePatches
             __instance.ImpostorText.gameObject.SetActive(false);
         else
         {
-            int impCount = PlayerTools.GetTeamPlayers(TeamType.Impostor).Count;
+            int impCount = PlayerTools.GetTeamPlayers(TeamType.Impostor).Count();
             
             if(impCount == 1)
                 __instance.ImpostorText.text = $"There is <color={ColorTools.TeamColors[TeamType.Impostor].GetHex()}>{impCount} impostor</color> among us";

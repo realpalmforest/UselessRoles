@@ -62,16 +62,6 @@ public static class PlayerTools
     
     public static bool Am(TeamType team) => PlayerControl.LocalPlayer.GetRole().TeamType == team;
 
-    public static List<PlayerControl> GetTeamPlayers(TeamType team)
-    {
-        var players = new List<PlayerControl>();
-        
-        foreach (var player in PlayerControl.AllPlayerControls)
-        {
-            if(player.GetRole().TeamType == team)
-                players.Add(player);
-        }
-        
-        return players;
-    }
+    public static IEnumerable<PlayerControl> GetTeamPlayers(TeamType team)
+        => PlayerControl.AllPlayerControls.ToArray().ToList().Where(player => player.GetRole().TeamType == team);
 }
