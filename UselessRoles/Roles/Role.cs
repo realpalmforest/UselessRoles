@@ -19,6 +19,10 @@ public abstract class Role
 
     public virtual void OnAssign()
     {
+    }
+
+    public virtual void OnHudStart(HudManager hud)
+    {
         if (TeamType == TeamType.Impostor)
         {
             foreach (var player in PlayerControl.AllPlayerControls)
@@ -27,11 +31,6 @@ public abstract class Role
                     player.ShowRoleUnderName();
             }
         }
-    }
-
-    public virtual void OnHudStart(HudManager hud)
-    {
-
     }
 
     public virtual void OnHudActive(HudManager hud, bool isActive)
@@ -73,7 +72,7 @@ public abstract class Role
     }
     
     
-    public IEnumerable GetButtons()
+    public static IEnumerable GetButtons()
     {
         Transform buttonContainer = HudManager.Instance.transform.FindChild("Buttons").FindChild("BottomRight");
         for (int i = 0; i < buttonContainer.childCount; i++)

@@ -9,6 +9,8 @@ public static class HudManagerPatches
     [HarmonyPostfix]
     public static void HudShowIntro_Postfix(HudManager __instance)
     {
+        PlayerControl.LocalPlayer.GetRole().OnAssign();
+        PlayerControl.LocalPlayer.ShowRoleUnderName();
         PlayerControl.LocalPlayer.GetRole().OnHudStart(__instance);
     }
 

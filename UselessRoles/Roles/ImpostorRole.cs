@@ -7,7 +7,8 @@ public class ImpostorRole : Role
 {
     public RoleTargetButton KillButton;
     public RoleActionButton SabotageButton;
-
+    public RoleVentButton VentButton;
+    
     public ImpostorRole()
     {
         Name = "Impostor";
@@ -20,9 +21,11 @@ public class ImpostorRole : Role
 
     public override void OnHudStart(HudManager hud)
     {
+        base.OnHudStart(hud);
+        
         CreateSabotageButton(hud);
         CreateKillButton(hud);
-        base.OnHudStart(hud);
+        VentButton = RoleActionButton.Create<RoleVentButton>("VentButton (Mod)");
     }
 
     protected void CreateKillButton(HudManager hud)
@@ -79,10 +82,5 @@ public class ImpostorRole : Role
                 SabotageButton.SetEnabled();
             }
         };
-    }
-    
-    protected void CreateVentButton(HudManager hud)
-    {
-        // do somethig
     }
 }

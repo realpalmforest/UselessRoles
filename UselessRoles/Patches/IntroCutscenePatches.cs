@@ -13,15 +13,11 @@ internal static class IntroCutscenePatches
     [HarmonyPrefix]
     public static void CutsceneBegin_Prefix()
     {
-        if (AmongUsClient.Instance.AmHost)
-        {
-            // The host assigns roles to everyone
-            foreach (var player in PlayerControl.AllPlayerControls)
-                RoleManager.AssignRole(player);
-        }
+        if (!AmongUsClient.Instance.AmHost) return;
         
-        PlayerControl.LocalPlayer.GetRole().OnAssign();
-        PlayerControl.LocalPlayer.ShowRoleUnderName();
+        // The host assigns roles to everyone
+        foreach (var player in PlayerControl.AllPlayerControls)
+            RoleManager.AssignRole(player);
     }
 
     [HarmonyPatch(nameof(IntroCutscene.SelectTeamToShow))]
