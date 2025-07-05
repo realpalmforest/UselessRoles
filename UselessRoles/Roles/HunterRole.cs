@@ -30,8 +30,7 @@ public class HunterRole : Role
         TrapButton.SetText("Trap", Color);
         TrapButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Trap.png");
         
-        TrapButton.DefaultCooldown = 30;
-        TrapButton.MeetingCooldown = 20;
+        TrapButton.SetCooldowns(20, 25, 15);
         TrapButton.OnClickEvent += (_, _) =>
         {
             TrapPositions.Add(PlayerControl.LocalPlayer.GetTruePosition());

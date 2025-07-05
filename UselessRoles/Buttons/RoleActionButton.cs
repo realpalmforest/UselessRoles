@@ -9,9 +9,6 @@ namespace UselessRoles.Buttons;
 [RegisterInIl2Cpp]
 public class RoleActionButton : ActionButton
 {
-    public event EventHandler OnClickEvent;
-    public event EventHandler OnFixedUpdateEvent;
-
     public float MeetingCooldown = 10f;
     public float DefaultCooldown = 10f;
     public float Cooldown = 10f;
@@ -63,26 +60,21 @@ public class RoleActionButton : ActionButton
 
     public override void DoClick()
     {
-        if (!base.isActiveAndEnabled)
-            return;
-        if (!PlayerControl.LocalPlayer)
-            return;
-        if (HudManager.Instance.IsIntroDisplayed)
-            return;
-        if (isCoolingDown)
-            return;
-        if (!canInteract)
-            return;
-
-        if (!InfiniteUses)
-            UsesRemaining--;
+        if(!CanClick()) return;
+        if (!InfiniteUses) UsesRemaining--;
 
         Cooldown = DefaultCooldown;
 
-        OnClickEvent?.Invoke(this, EventArgs.Empty);
+        RunButtonClickEvent();
     }
 
     public virtual void FixedUpdate()
+    {
+        UpdateCooldown();
+        RunFixedUpdateEvent();
+    }
+
+    protected void UpdateCooldown()
     {
         if (Cooldown > 0f)
         {
@@ -91,14 +83,12 @@ public class RoleActionButton : ActionButton
             Cooldown = Math.Clamp(Cooldown, 0f, DefaultCooldown);
             base.SetCoolDown(Cooldown, DefaultCooldown);
         }
-
-        if ((UsesRemaining <= 0 && !InfiniteUses) || isCoolingDown)
-            base.SetDisabled();
-        else base.SetEnabled();
         
-        OnFixedUpdateEvent?.Invoke(this, EventArgs.Empty);
+        if (CanClick())
+            base.SetEnabled();
+        else base.SetDisabled();
     }
-
+    
     public void SetText(string text, Color? color)
     {
         buttonLabelText.text = text;
@@ -115,6 +105,14 @@ public class RoleActionButton : ActionButton
 
         isCoolingDown = cooldown > 0;
     }
+
+    protected virtual bool CanClick() => base.isActiveAndEnabled && !HudManager.Instance.IsIntroDisplayed && !isCoolingDown && (InfiniteUses || UsesRemaining > 0);
+    
+    public event EventHandler OnClickEvent;
+    protected void RunButtonClickEvent() => OnClickEvent?.Invoke(this, EventArgs.Empty);
+    public event EventHandler OnFixedUpdateEvent;
+    protected void RunFixedUpdateEvent() => OnFixedUpdateEvent?.Invoke(this, EventArgs.Empty);
+    
     
     public static T Create<T>(string name = "RoleActionButton") where T : RoleActionButton
     {

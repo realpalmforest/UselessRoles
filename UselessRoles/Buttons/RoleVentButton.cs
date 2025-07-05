@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 using UselessRoles.Utility;
 
@@ -7,29 +9,9 @@ public sealed class RoleVentButton : RoleActionButton
 {
     public Color HighlightColor = Color.red;
     
-    public Vent Target
-    {
-        get => this._targetVent;
-        set
-        {
-            // If it's the same vent (and not null), skip
-            if(value == _targetVent && _targetVent != null)
-                return;
-            
-            _targetVent.SetCustomOutline(HighlightColor, false, false);
-            _targetVent = value;
-            
-            if (_targetVent && !isCoolingDown)
-            {
-                _targetVent.SetCustomOutline(HighlightColor, true, true);
-                base.SetEnabled();
-            }
-            else base.SetDisabled();
-        }
-    }
-
-    private Vent _targetVent;
-
+    public bool IsTargetInRange => Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(), TargetVent.transform.position) <= TargetVent.UsableDistance;
+    public Vent TargetVent { get; set; }
+    
     public override void Awake()
     {
         base.Awake();
@@ -40,83 +22,88 @@ public sealed class RoleVentButton : RoleActionButton
     
     public override void FixedUpdate()
     {
-        base.FixedUpdate();
+        UpdateCooldown();
         
-        // Skip if the player is already in a vent
-        if (PlayerControl.LocalPlayer.inVent)
-            return;
-
         float closestDistance = float.MaxValue;
         Vent closestVent = null;
 
         foreach (var vent in GameObject.FindObjectsOfType<Vent>())
         {
+            // Remove all outlines by default
+            vent.SetCustomOutline(HighlightColor, false, false);
+            
             if (!vent || vent.UsableDistance < 0f)
                 continue;
 
             float dist = Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(), vent.transform.position);
-            if (dist < vent.UsableDistance && dist < closestDistance)
+            if (dist < closestDistance)
             {
                 closestDistance = dist;
                 closestVent = vent;
             }
         }
+
+        TargetVent = closestVent;
+
+        if (TargetVent && !isCoolingDown)
+            TargetVent.SetCustomOutline(HighlightColor, true, IsTargetInRange);
         
-        Target = closestDistance > closestVent?.UsableDistance ? null : closestVent;
+        RunFixedUpdateEvent();
     }
     
     public override void DoClick()
     {
-        base.DoClick();
-        UseTarget(out bool inVentNow);
-
-        if (inVentNow)
-            Cooldown = 0;
+        if (!CanClick()) return;
+        
+        RunButtonClickEvent();
+        UseTarget();
     }
 
-    private void UseTarget(out bool inVentNow)
+    private void UseTarget()
     {
-        inVentNow = false;
-        
-        if (!CanUse())
+        if (!CanClick())
             return;
         
-        // AchievementManager.Instance.OnConsoleUse(Target);
-        PlayerControl player = PlayerControl.LocalPlayer;
-
-        if (player.walkingToVent)
-            return;
+        AchievementManager.Instance.OnConsoleUse(TargetVent.Cast<IUsable>());
+        var player = PlayerControl.LocalPlayer;
             
         if (player.inVent)
         {
-            player.MyPhysics.RpcExitVent(Target.Id);
-            Target.SetButtons(false);
+            player.MyPhysics.RpcExitVent(TargetVent.Id);
+            TargetVent.SetButtons(false);
+            
+            // Reset cooldown to default when leaving a vent
+            Cooldown = DefaultCooldown;
+            base.SetCoolDown(Cooldown, DefaultCooldown);
+            
+            // Reduce uses remaining only when leaving a vent
+            if (!InfiniteUses) UsesRemaining--;
         }
         else
         {
-            player.MyPhysics.RpcEnterVent(Target.Id);
-            Target.SetButtons(true);
+            player.MyPhysics.RpcEnterVent(TargetVent.Id);
+            TargetVent.SetButtons(true);
             
-            inVentNow = true;
+            // No cooldown for leaving a vent
+            Cooldown = 0;
+            base.SetCoolDown(Cooldown, DefaultCooldown);
         }
     }
-
-    private bool CanUse()
+    
+    protected override bool CanClick()
     {
-        if (!Target)
-            return false;
-        
         var player = PlayerControl.LocalPlayer;
         var system = ShipStatus.Instance.Systems[SystemTypes.Ventilation].Cast<VentilationSystem>();
         
-        bool couldUse = 
-            !player.Data.IsDead && 
-            !player.MustCleanVent(Target.Id) &&
-            !system.IsVentCurrentlyBeingCleaned(Target.Id) || 
-            (player.inVent && Vent.currentVent == Target) &&
-            (player.CanMove || player.inVent);
-        
-        float distance = Vector2.Distance(player.GetTruePosition(), Target.transform.position);
-        return couldUse && distance <= Target.UsableDistance && !PhysicsHelpers.AnythingBetween(player.Collider, player.Collider.bounds.center, Target.transform.position, Constants.ShipOnlyMask, useTriggers: false);
+        bool canEnterVent = TargetVent &&
+                            IsTargetInRange && 
+                            !PhysicsHelpers.AnythingBetween(player.Collider, player.Collider.bounds.center, TargetVent.transform.position, Constants.ShipOnlyMask, useTriggers: false);
+
+        return base.CanClick() &&
+               (canEnterVent || player.inVent) &&
+               !player.walkingToVent &&
+               !player.Data.IsDead &&
+               !player.MustCleanVent(TargetVent.Id) &&
+               !system.IsVentCurrentlyBeingCleaned(TargetVent.Id);
     }
 }

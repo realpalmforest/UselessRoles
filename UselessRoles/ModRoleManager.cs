@@ -7,7 +7,7 @@ using UselessRoles.Utility;
 
 namespace UselessRoles;
 
-public static class RoleManager
+public static class ModRoleManager
 {
     public static readonly Dictionary<byte, Role> Roles = new Dictionary<byte, Role>();
 

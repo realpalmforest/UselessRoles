@@ -12,7 +12,7 @@ public class ImpostorRole : Role
     public ImpostorRole()
     {
         Name = "Impostor";
-        Description = "Kill all the crewmates without getting voted out";
+        Description = "Kill the crew without getting caught";
         Color = ColorTools.RoleColors[RoleType.Impostor];
 
         RoleType = RoleType.Impostor;
@@ -48,6 +48,9 @@ public class ImpostorRole : Role
         SabotageButton.SetText(hud.SabotageButton.buttonLabelText.text, Color);
         SabotageButton.graphic.sprite = hud.SabotageButton.graphic.sprite;
         
+        if(!GameManager.Instance.SabotagesEnabled())
+            return;
+        
         SabotageButton.OnClickEvent += (_, _) =>
         {
             if(PlayerControl.LocalPlayer.inVent)
@@ -67,20 +70,15 @@ public class ImpostorRole : Role
         
         SabotageButton.OnFixedUpdateEvent += (_, _) =>
         {
-            if (!GameManager.Instance || !PlayerControl.LocalPlayer)
-            {
-                SabotageButton.ToggleVisible(false);
+            if(!GameManager.Instance.SabotagesEnabled())
+                return;
+            
+            // Disable the sabotage button if in vent or petting
+            if (PlayerControl.LocalPlayer.inVent || PlayerControl.LocalPlayer.petting)
                 SabotageButton.SetDisabled();
-            }
-            else if (PlayerControl.LocalPlayer.inVent || !GameManager.Instance.SabotagesEnabled() || PlayerControl.LocalPlayer.petting)
-            {
-                SabotageButton.ToggleVisible(PlayerTools.Am(TeamType.Impostor) && GameManager.Instance.SabotagesEnabled());
-                SabotageButton.SetDisabled();
-            }
-            else
-            {
-                SabotageButton.SetEnabled();
-            }
+            else SabotageButton.SetEnabled();
         };
     }
+    
+    
 }
