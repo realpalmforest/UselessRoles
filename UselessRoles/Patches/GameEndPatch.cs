@@ -1,14 +1,9 @@
 ﻿namespace UselessRoles.Patches;
 
-[HarmonyPatch]
+[HarmonyPatch(typeof(LogicGameFlow), nameof(LogicGameFlow.CheckEndCriteria))]
+[HarmonyPatch(typeof(LogicGameFlowNormal), nameof(LogicGameFlow.CheckEndCriteria))]
 [HarmonyPriority(Priority.First)]
 internal static class GameEndPatch
 {
-    [HarmonyPatch(typeof(LogicGameFlow), nameof(LogicGameFlow.CheckEndCriteria))]
-    [HarmonyPatch(typeof(LogicGameFlowNormal), nameof(LogicGameFlow.CheckEndCriteria))]
-    [HarmonyPatch(typeof(LogicGameFlowHnS), nameof(LogicGameFlow.CheckEndCriteria))]
-    public static bool Prefix()
-    {
-        return false;
-    }
+    internal static bool Prefix() => false;
 }

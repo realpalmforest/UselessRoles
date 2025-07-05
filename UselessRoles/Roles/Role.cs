@@ -17,7 +17,7 @@ public abstract class Role
     public string Name { get; protected init; }
     public string Description { get; protected init; }
 
-    public virtual void OnAssign()
+    public virtual void OnReceive()
     {
     }
 

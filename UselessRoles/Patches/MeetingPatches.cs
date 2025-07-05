@@ -7,14 +7,14 @@ internal static class MeetingPatches
 {
     [HarmonyPatch(nameof(MeetingHud.Awake))]
     [HarmonyPrefix]
-    public static void MeetingStart_Prefix(MeetingHud __instance)
+    internal static void MeetingStart_Prefix(MeetingHud __instance)
     {
         PlayerControl.LocalPlayer.GetRole().OnMeetingStart(__instance);
     }
 
     [HarmonyPatch(nameof(MeetingHud.OnDestroy))]
     [HarmonyPostfix]
-    public static void MeetingEnd_Postfix(MeetingHud __instance)
+    internal static void MeetingEnd_Postfix(MeetingHud __instance)
     {
         PlayerControl.LocalPlayer.GetRole().OnMeetingEnd(__instance);
     }

@@ -3,20 +3,18 @@
 namespace UselessRoles.Patches;
 
 [HarmonyPatch(typeof(HudManager))]
-public static class HudManagerPatches
+internal static class HudManagerPatches
 {
     [HarmonyPatch(nameof(HudManager.OnGameStart))]
     [HarmonyPostfix]
-    public static void HudShowIntro_Postfix(HudManager __instance)
+    internal static void HudShowIntro_Postfix(HudManager __instance)
     {
-        PlayerControl.LocalPlayer.GetRole().OnAssign();
-        PlayerControl.LocalPlayer.ShowRoleUnderName();
         PlayerControl.LocalPlayer.GetRole().OnHudStart(__instance);
     }
 
     [HarmonyPatch(methodName: nameof(HudManager.SetHudActive), argumentTypes: [typeof(bool)])]
     [HarmonyPostfix]
-    public static void SetHudActive_Postfix(HudManager __instance, bool isActive)
+    internal static void SetHudActive_Postfix(HudManager __instance, bool isActive)
     {
         PlayerControl.LocalPlayer.GetRole().OnHudActive(__instance, isActive);
     }

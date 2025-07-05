@@ -9,17 +9,6 @@ namespace UselessRoles.Utility;
 
 public static class PlayerTools
 {
-    public static PlayerControl GetPlayerById(byte playerId)
-    {
-        foreach (var player in PlayerControl.AllPlayerControls)
-        {
-            if (player.PlayerId == playerId)
-                return player;
-        }
-
-        return null;
-    }
-
     public static Role GetRole(this PlayerControl player)
     {
         return RoleManager.Roles[player.PlayerId];
@@ -61,7 +50,8 @@ public static class PlayerTools
     }
     
     public static bool Am(TeamType team) => PlayerControl.LocalPlayer.GetRole().TeamType == team;
-
+    public static bool Am(RoleType role) => PlayerControl.LocalPlayer.GetRole().RoleType == role;
+    
     public static IEnumerable<PlayerControl> GetTeamPlayers(TeamType team)
         => PlayerControl.AllPlayerControls.ToArray().ToList().Where(player => player.GetRole().TeamType == team);
 }

@@ -3,7 +3,7 @@ using UselessRoles.Utility;
 
 namespace UselessRoles.Buttons;
 
-public class RoleVentButton : RoleActionButton
+public sealed class RoleVentButton : RoleActionButton
 {
     public Color HighlightColor = Color.red;
     

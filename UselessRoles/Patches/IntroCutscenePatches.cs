@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq;
+﻿using System.Linq;
 using UselessRoles.Roles;
 using UselessRoles.Utility;
 
@@ -11,7 +10,7 @@ internal static class IntroCutscenePatches
     [HarmonyPatch(nameof(IntroCutscene.CoBegin))]
     [HarmonyPriority(Priority.First)]
     [HarmonyPrefix]
-    public static void CutsceneBegin_Prefix()
+    internal static void CutsceneBegin_Prefix()
     {
         if (!AmongUsClient.Instance.AmHost) return;
         
@@ -22,7 +21,7 @@ internal static class IntroCutscenePatches
 
     [HarmonyPatch(nameof(IntroCutscene.SelectTeamToShow))]
     [HarmonyPostfix]
-    public static void SelectTeammates_Postfix(ref Il2CppSystem.Collections.Generic.List<PlayerControl> __result)
+    internal static void SelectTeammates_Postfix(ref Il2CppSystem.Collections.Generic.List<PlayerControl> __result)
     {
         var sameTeam = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
 
@@ -32,7 +31,7 @@ internal static class IntroCutscenePatches
                 continue;
 
             var control = player.Object;
-            if (!control || control == PlayerControl.LocalPlayer)
+            if (!control || control.AmOwner)
                 continue;
 
             if (PlayerTools.Am(control.GetRole().TeamType))
@@ -47,7 +46,7 @@ internal static class IntroCutscenePatches
 
     [HarmonyPatch(nameof(IntroCutscene.BeginCrewmate))]
     [HarmonyPostfix]
-    public static void ShowTeamCrewmate_Postfix(IntroCutscene __instance)
+    internal static void ShowTeam_Postfix(IntroCutscene __instance)
     {
         Role role = PlayerControl.LocalPlayer.GetRole();
         
@@ -72,7 +71,7 @@ internal static class IntroCutscenePatches
 
     [HarmonyPatch(typeof(IntroCutscene._ShowRole_d__41), nameof(IntroCutscene._ShowRole_d__41.MoveNext))]
     [HarmonyPostfix]
-    public static void ShowRole_Postfix(IntroCutscene._ShowRole_d__41 __instance)
+    internal static void ShowRole_Postfix(IntroCutscene._ShowRole_d__41 __instance)
     {
         if (__instance.__1__state != 1)
             return;

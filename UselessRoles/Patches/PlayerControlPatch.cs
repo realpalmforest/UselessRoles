@@ -7,8 +7,9 @@ internal static class PlayerControlPatch
 {
     [HarmonyPatch(nameof(PlayerControl.MurderPlayer))]
     [HarmonyPostfix]
-    public static void MurderPlayer_Postfix(PlayerControl __instance, PlayerControl target, MurderResultFlags resultFlags)
+    internal static void MurderPlayer_Postfix(PlayerControl __instance, PlayerControl target, MurderResultFlags resultFlags)
     {
+        // Run OnKilled() on the murder victim's role only
         if (!target.AmOwner)
             return;
 
