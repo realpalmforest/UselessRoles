@@ -1,4 +1,5 @@
-﻿using UselessRoles.Buttons;
+﻿using UnityEngine;
+using UselessRoles.Buttons;
 using UselessRoles.Utility;
 
 namespace UselessRoles.Roles;
@@ -25,18 +26,18 @@ public class ImpostorRole : Role
         
         CreateSabotageButton(hud);
         CreateKillButton(hud);
-        VentButton = RoleActionButton.Create<RoleVentButton>("VentButton (Mod)");
+        VentButton = CreateButton<RoleVentButton>("VentButton (Mod)");
         VentButton.DefaultDuration = 10;
         VentButton.InfiniteUses = false;
     }
 
     protected void CreateKillButton(HudManager hud)
     {
-        KillButton = RoleActionButton.Create<RoleTargetButton>("KillButton (Mod)");
+        KillButton = CreateButton<RoleTargetButton>("KillButton (Mod)");
         KillButton.SetCooldowns(15, 25, 20);
         
         KillButton.SetText(hud.KillButton.buttonLabelText.text, Color);
-        KillButton.graphic.sprite = hud.KillButton.graphic.sprite;
+        KillButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Kill_Button.png");
         
         KillButton.ValidTargets = player => !PlayerTools.IsSameTeam(Player, KillButton.Target);
         KillButton.OnClickEvent += (_, _) => PlayerControl.LocalPlayer.RpcMurderPlayer(KillButton.Target, true);
@@ -44,11 +45,11 @@ public class ImpostorRole : Role
     
     protected void CreateSabotageButton(HudManager hud)
     {
-        SabotageButton = RoleActionButton.Create<RoleActionButton>("SabotageButton (Mod)");
+        SabotageButton = CreateButton<RoleActionButton>("SabotageButton (Mod)");
         SabotageButton.SetCooldowns(0, 0, 0);
         
         SabotageButton.SetText(hud.SabotageButton.buttonLabelText.text, Color);
-        SabotageButton.graphic.sprite = hud.SabotageButton.graphic.sprite;
+        SabotageButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Sabotage_Button.png");
         
         if(!GameManager.Instance.SabotagesEnabled())
             return;

@@ -84,4 +84,14 @@ public abstract class Role
             }
         }
     }
+    
+    protected static T CreateButton<T>(string name = "ActionButton (Mod)") where T : RoleActionButton
+    {
+        var button = GameObject.Instantiate(HudManager.Instance.AbilityButton.gameObject, HudManager.Instance.AbilityButton.transform.parent);
+        button.SetActive(true);
+        button.name = name;
+        
+        GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
+        return button.AddComponent<T>();
+    }
 }

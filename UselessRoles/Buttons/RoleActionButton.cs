@@ -152,14 +152,4 @@ public class RoleActionButton : ActionButton
     protected virtual void RunButtonClickEvent() => OnClickEvent?.Invoke(this, EventArgs.Empty);
     public event EventHandler OnUpdateEvent;
     protected virtual void RunUpdateEvent() => OnUpdateEvent?.Invoke(this, EventArgs.Empty);
-    
-    public static T Create<T>(string name = "RoleActionButton") where T : RoleActionButton
-    {
-        var button = GameObject.Instantiate(HudManager.Instance.AbilityButton.gameObject, HudManager.Instance.AbilityButton.transform.parent);
-        button.SetActive(true);
-        button.name = name;
-        
-        GameObject.DestroyImmediate(button.GetComponent<AbilityButton>());
-        return button.AddComponent<T>();
-    }
 }

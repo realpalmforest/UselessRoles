@@ -25,10 +25,10 @@ public class HunterRole : Role
     {
         base.OnHudStart(hud);
 
-        TrapButton = RoleActionButton.Create<RoleActionButton>("TrapButton");
+        TrapButton = CreateButton<RoleActionButton>("TrapButton (Mod)");
         
         TrapButton.SetText("Trap", Color);
-        TrapButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Trap.png");
+        TrapButton.graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Trap_Button.png");
         
         TrapButton.SetCooldowns(20, 25, 15);
         TrapButton.OnClickEvent += (_, _) =>

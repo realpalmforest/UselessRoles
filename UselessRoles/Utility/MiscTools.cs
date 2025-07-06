@@ -22,4 +22,15 @@ public static class MiscTools
         
         return casted;
     }
+
+    public static Sprite Clone(this Sprite sprite) => Sprite.Create(
+        sprite.texture,
+        sprite.rect,
+        sprite.pivot,
+        sprite.pixelsPerUnit,
+        0,
+        SpriteMeshType.FullRect,
+        sprite.border,
+        false
+    );
 }

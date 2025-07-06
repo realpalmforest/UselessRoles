@@ -7,23 +7,40 @@ namespace UselessRoles.Buttons;
 
 public sealed class RoleVentButton : RoleActionButton
 {
-    public Color HighlightColor = Color.red;
-    
     public bool IsTargetInRange => Vector2.Distance(PlayerControl.LocalPlayer.GetTruePosition(), TargetVent.transform.position) <= TargetVent.UsableDistance;
     public Vent TargetVent { get; set; }
+    
+    
+    public Color HighlightColor = Color.red;
+
+    private SpriteRenderer highlightGraphic;
     
     public override void Awake()
     {
         base.Awake();
         
-        graphic.sprite = HudManager.Instance.ImpostorVentButton.graphic.sprite;
-        SetText(HudManager.Instance.ImpostorVentButton.buttonLabelText.text, HighlightColor);
+        SetText("Vent", HighlightColor);
+        
+        graphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Vent_Button_Base.png");
+        CreateHighlight();
+    }
+
+    private void CreateHighlight()
+    {
+        highlightGraphic = GameObject.Instantiate(graphic, graphic.transform.parent);
+        for (int i = 0; i < highlightGraphic.transform.childCount; i++)
+            GameObject.DestroyImmediate(highlightGraphic.transform.GetChild(i).gameObject);
+        
+        highlightGraphic.name = "VentButtonHighlight";
+        highlightGraphic.sprite = AssetTools.LoadSprite("UselessRoles.Resources.Vent_Button_Color.png");
+        highlightGraphic.color = HighlightColor;
     }
     
     public override void Update()
     {
         FindTarget();
         base.Update();
+        UpdateHighlight();
     }
 
     private void FindTarget()
@@ -51,6 +68,24 @@ public sealed class RoleVentButton : RoleActionButton
 
         if (CanClick())
             TargetVent.SetCustomOutline(HighlightColor, true, IsTargetInRange);
+    }
+
+    private void UpdateHighlight()
+    {
+        highlightGraphic.transform.localPosition = graphic.transform.localPosition;
+        highlightGraphic.material.SetFloat("_Percent", graphic.material.GetFloat("_Percent"));
+        
+        // Sync colors between highlight graphic and base graphic
+        if (canInteract)
+        {
+            highlightGraphic.color = new Color(HighlightColor.r, HighlightColor.g, HighlightColor.b, Palette.EnabledColor.a);
+            highlightGraphic.material.SetFloat("_Desat", 0f);
+        }
+        else
+        {
+            highlightGraphic.color = new Color(HighlightColor.r, HighlightColor.g, HighlightColor.b, Palette.DisabledClear.a);
+            highlightGraphic.material.SetFloat("_Desat", 1f);
+        }
     }
     
     public override void DoClick()
