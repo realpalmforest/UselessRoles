@@ -15,11 +15,10 @@ public class RoleTargetButton : RoleActionButton
     
     public PlayerControl Target { get; set; }
 
-    public new void FixedUpdate()
+    public override void Update()
     {
-        UpdateCooldown();
         FindTarget();
-        RunFixedUpdateEvent();
+        base.Update();
     }
 
     private void FindTarget()

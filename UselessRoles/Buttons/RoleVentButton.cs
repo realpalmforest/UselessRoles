@@ -20,10 +20,14 @@ public sealed class RoleVentButton : RoleActionButton
         SetText(HudManager.Instance.ImpostorVentButton.buttonLabelText.text, HighlightColor);
     }
     
-    public override void FixedUpdate()
+    public override void Update()
     {
-        UpdateCooldown();
-        
+        FindTarget();
+        base.Update();
+    }
+
+    private void FindTarget()
+    {
         float closestDistance = float.MaxValue;
         Vent closestVent = null;
 
@@ -45,20 +49,16 @@ public sealed class RoleVentButton : RoleActionButton
 
         TargetVent = closestVent;
 
-        if (TargetVent && !isCoolingDown)
+        if (CanClick())
             TargetVent.SetCustomOutline(HighlightColor, true, IsTargetInRange);
-        
-        RunFixedUpdateEvent();
     }
     
     public override void DoClick()
     {
-        if (!CanClick()) return;
-        
-        RunButtonClickEvent();
+        base.DoClick();
         UseTarget();
     }
-
+    
     private void UseTarget()
     {
         if (!CanClick())
@@ -66,27 +66,13 @@ public sealed class RoleVentButton : RoleActionButton
         
         AchievementManager.Instance.OnConsoleUse(TargetVent.Cast<IUsable>());
         var player = PlayerControl.LocalPlayer;
-            
-        if (player.inVent)
-        {
-            player.MyPhysics.RpcExitVent(TargetVent.Id);
-            TargetVent.SetButtons(false);
-            
-            // Reset cooldown to default when leaving a vent
-            Cooldown = DefaultCooldown;
-            base.SetCoolDown(Cooldown, DefaultCooldown);
-            
-            // Reduce uses remaining only when leaving a vent
-            if (!InfiniteUses) UsesRemaining--;
-        }
-        else
+        
+        // Handle player entering vent
+        // (Vent exiting is handles by AbilityEnd())
+        if (!player.inVent)
         {
             player.MyPhysics.RpcEnterVent(TargetVent.Id);
             TargetVent.SetButtons(true);
-            
-            // No cooldown for leaving a vent
-            Cooldown = 0;
-            base.SetCoolDown(Cooldown, DefaultCooldown);
         }
     }
     
@@ -105,5 +91,14 @@ public sealed class RoleVentButton : RoleActionButton
                !player.Data.IsDead &&
                !player.MustCleanVent(TargetVent.Id) &&
                !system.IsVentCurrentlyBeingCleaned(TargetVent.Id);
+    }
+
+    protected override void AbilityEnd()
+    {
+        // Force the player to leave the vent when the ability ends
+        PlayerControl.LocalPlayer.MyPhysics.RpcExitVent(TargetVent.Id);
+        TargetVent.SetButtons(false);
+        
+        base.AbilityEnd();
     }
 }

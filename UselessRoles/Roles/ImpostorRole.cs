@@ -26,6 +26,8 @@ public class ImpostorRole : Role
         CreateSabotageButton(hud);
         CreateKillButton(hud);
         VentButton = RoleActionButton.Create<RoleVentButton>("VentButton (Mod)");
+        VentButton.DefaultDuration = 10;
+        VentButton.InfiniteUses = false;
     }
 
     protected void CreateKillButton(HudManager hud)
@@ -68,7 +70,7 @@ public class ImpostorRole : Role
             SabotageButton.SetCooldowns(0, 0, 0);
         };
         
-        SabotageButton.OnFixedUpdateEvent += (_, _) =>
+        SabotageButton.OnUpdateEvent += (_, _) =>
         {
             if(!GameManager.Instance.SabotagesEnabled())
                 return;
