@@ -7,18 +7,6 @@ namespace UselessRoles.Patches;
 [HarmonyPatch(typeof(IntroCutscene))]
 internal static class IntroCutscenePatches
 {
-    [HarmonyPatch(nameof(IntroCutscene.CoBegin))]
-    [HarmonyPriority(Priority.First)]
-    [HarmonyPrefix]
-    internal static void CutsceneBegin_Prefix()
-    {
-        if (!AmongUsClient.Instance.AmHost) return;
-        
-        // The host assigns roles to everyone
-        foreach (var player in PlayerControl.AllPlayerControls)
-            RoleManager.AssignRole(player);
-    }
-
     [HarmonyPatch(nameof(IntroCutscene.SelectTeamToShow))]
     [HarmonyPostfix]
     internal static void SelectTeammates_Postfix(ref Il2CppSystem.Collections.Generic.List<PlayerControl> __result)

@@ -11,7 +11,7 @@ public static class PlayerTools
 {
     public static Role GetRole(this PlayerControl player)
     {
-        if (!ModRoleManager.Roles.TryGetValue(player.PlayerId, out var role))
+        if (!ModRoleManager.AssignedRoles.TryGetValue(player.PlayerId, out var role))
             Logger<UselessRolesPlugin>.Error($"Player {player.Data.PlayerName} does not have an assigned role");
         
         return role;
@@ -19,7 +19,15 @@ public static class PlayerTools
 
     public static bool Am(TeamType team) => PlayerControl.LocalPlayer.GetRole().TeamType == team;
     public static bool Am(RoleType role) => PlayerControl.LocalPlayer.GetRole().RoleType == role;
-    
+
+    public static bool IsSameTeam(PlayerControl player1, PlayerControl player2)
+    {
+        if (!player1 || !player2)
+            return false;
+        
+        return player1.GetRole().TeamType == player2.GetRole().TeamType;
+    }
+
     public static void ShowRoleUnderName(this PlayerControl player)
     {
         var role = player.GetRole();
@@ -32,6 +40,7 @@ public static class PlayerTools
     {
         var players = PlayerControl.AllPlayerControls
             .ToArray()
+            .Where(plr => !plr.AmOwner)
             .Where(predicate)
             .ToList();
 

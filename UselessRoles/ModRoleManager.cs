@@ -9,7 +9,7 @@ namespace UselessRoles;
 
 public static class ModRoleManager
 {
-    public static readonly Dictionary<byte, Role> Roles = new Dictionary<byte, Role>();
+    public static readonly Dictionary<byte, Role> AssignedRoles = new();
 
     private static void SetPlayerRole(PlayerControl player, RoleType roleType)
     {
@@ -21,15 +21,14 @@ public static class ModRoleManager
             _ => new Roles.CrewmateRole()
         };
 
-        Roles[player.PlayerId] = role;
+        AssignedRoles[player.PlayerId] = role;
         role.Player = player;
 
         // If this role is for the local player, show it
         if (player.AmOwner)
         {
             role.OnReceive(); // When the local player receives the role
-            player.ShowRoleUnderName(); // Show the local player role under name
-            
+
             Logger<UselessRolesPlugin>.Info($"[RPC] Received local role: {role.Name}");
             return;
         }
@@ -45,7 +44,7 @@ public static class ModRoleManager
         RpcSetRole(player, (uint)type);
     }
 
-    [MethodRpc((byte)UselessRpcCalls.AssignRole)]
+    [MethodRpc((byte)UselessRpcCalls.AssignRole, SendImmediately = true)]
     public static void RpcSetRole(PlayerControl player, uint roleType)
     {
         if (!player)

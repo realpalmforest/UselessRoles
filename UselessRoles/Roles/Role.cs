@@ -23,13 +23,12 @@ public abstract class Role
 
     public virtual void OnHudStart(HudManager hud)
     {
-        if (TeamType == TeamType.Impostor)
+        foreach (var player in PlayerControl.AllPlayerControls)
         {
-            foreach (var player in PlayerControl.AllPlayerControls)
-            {
-                if (player.GetRole().TeamType == TeamType)
-                    player.ShowRoleUnderName();
-            }
+            // Show this player's role if they're the local player
+            // or both the local player and this player are impostors
+            if(player.AmOwner || (TeamType == TeamType.Impostor && player.GetRole().TeamType == TeamType))
+                player.ShowRoleUnderName();
         }
     }
 

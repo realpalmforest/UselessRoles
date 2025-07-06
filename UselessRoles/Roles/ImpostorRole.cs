@@ -31,12 +31,12 @@ public class ImpostorRole : Role
     protected void CreateKillButton(HudManager hud)
     {
         KillButton = RoleActionButton.Create<RoleTargetButton>("KillButton (Mod)");
-        KillButton.SetCooldowns(30, 45, 40);
+        KillButton.SetCooldowns(15, 25, 20);
         
         KillButton.SetText(hud.KillButton.buttonLabelText.text, Color);
         KillButton.graphic.sprite = hud.KillButton.graphic.sprite;
         
-        KillButton.ValidTargets = (player => player.GetRole().TeamType != this.TeamType && !player.Data.IsDead);
+        KillButton.ValidTargets = player => !PlayerTools.IsSameTeam(Player, KillButton.Target);
         KillButton.OnClickEvent += (_, _) => PlayerControl.LocalPlayer.RpcMurderPlayer(KillButton.Target, true);
     }
     
