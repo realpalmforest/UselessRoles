@@ -14,6 +14,7 @@ internal static class RoleManagerPatch
     [HarmonyPrefix]
     internal static bool SelectRoles_Prefix()
     {
+        ModRoleManager.IntroShown = false;
         RemoveVanillaRoles();
         
         if (!AmongUsClient.Instance.AmHost) return false;
@@ -39,11 +40,6 @@ internal static class RoleManagerPatch
             .OrderBy(c => c.Id)
             .Select(c => c.Character.Data)
             .ToList();
-        
-        // Add all dummy players
-        playerInfos.AddRange(GameData.Instance.AllPlayers
-            .ToArray().ToList()
-            .Where(player => player.Object != null && player.Object.isDummy));
         
         IGameOptions gameOptions = GameOptionsManager.Instance.CurrentGameOptions;
         LogicRoleSelection logic = GameManager.Instance.LogicRoleSelection;

@@ -8,14 +8,14 @@ public static class ColorTools
 {
     public static readonly Dictionary<RoleType, Color> RoleColors = new()
     {
-        { RoleType.Impostor, Color.red },
+        { RoleType.Impostor, new Color32(255, 25, 25, 255) },
         { RoleType.Crewmate, Color.cyan.RGBMultiplied(1.5f) },
         { RoleType.Hunter, new Color32(76, 120, 63, 255) },
     };
 
     public static readonly Dictionary<TeamType, Color> TeamColors = new()
     {
-        { TeamType.Impostor, Color.red },
+        { TeamType.Impostor, new Color32(255, 25, 25, 255) },
         { TeamType.Crewmate, Color.cyan.RGBMultiplied(1.2f) }
     };
     

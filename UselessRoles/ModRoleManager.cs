@@ -11,8 +11,14 @@ public static class ModRoleManager
 {
     public static readonly Dictionary<byte, Role> AssignedRoles = new();
 
+    public static bool IntroShown { get; set; } = false;
+    
     private static void SetPlayerRole(PlayerControl player, RoleType roleType)
     {
+        // Inform the existing role instance of the switch locally
+        if (player.AmOwner && AssignedRoles.TryGetValue(player.PlayerId, out Role existingRole))
+            existingRole.OnRoleSwitch();
+        
         Role role = roleType switch
         {
             RoleType.Impostor => new Roles.ImpostorRole(),
@@ -29,6 +35,9 @@ public static class ModRoleManager
         {
             role.OnReceive(); // When the local player receives the role
 
+            // If the intro was already shown, start hud now
+            if(IntroShown) role.OnHudStart(HudManager.Instance);
+            
             Logger<UselessRolesPlugin>.Info($"[RPC] Received local role: {role.Name}");
             return;
         }

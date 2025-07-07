@@ -9,6 +9,13 @@ internal static class HudManagerPatches
     [HarmonyPostfix]
     internal static void HudShowIntro_Postfix(HudManager __instance)
     {
+        // If the game is in freeplay, consider the intro shown
+        if (TutorialManager.InstanceExists)
+        {
+            ModRoleManager.IntroShown = true;
+            return;
+        }
+        
         PlayerControl.LocalPlayer.GetRole().OnHudStart(__instance);
     }
 

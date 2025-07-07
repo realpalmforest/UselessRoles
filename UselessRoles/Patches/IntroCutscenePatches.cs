@@ -43,10 +43,15 @@ internal static class IntroCutscenePatches
         __instance.TeamTitle.color = ColorTools.TeamColors[role.TeamType];
 
         // Show impostor count if not impostor
-        if(role.TeamType == TeamType.Impostor)
+        if (role.TeamType == TeamType.Impostor)
+        {
+            Logger<UselessRolesPlugin>.Info("Showing IMPOSTOR Team intro cutscene");
             __instance.ImpostorText.gameObject.SetActive(false);
+        }
         else
         {
+            Logger<UselessRolesPlugin>.Info("Showing CREWMATE Team intro cutscene");
+            
             int impCount = PlayerTools.GetTeamPlayers(TeamType.Impostor).Count();
             
             if(impCount == 1)
@@ -72,5 +77,7 @@ internal static class IntroCutscenePatches
         __instance.__4__this.RoleText.color = role.Color;
         __instance.__4__this.YouAreText.color = role.Color;
         __instance.__4__this.RoleBlurbText.color = role.Color;
+
+        ModRoleManager.IntroShown = true;
     }
 }

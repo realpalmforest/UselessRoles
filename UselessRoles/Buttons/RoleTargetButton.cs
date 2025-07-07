@@ -63,6 +63,7 @@ public class RoleTargetButton : RoleActionButton
     
     protected override bool CanClick() => base.CanClick() && 
                                           Target && 
+                                          !Target.Data.IsDead &&
                                           PlayerControl.LocalPlayer.CanMove && 
                                           !PlayerControl.LocalPlayer.inVent && 
                                           !PlayerControl.LocalPlayer.walkingToVent;

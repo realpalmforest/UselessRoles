@@ -9,6 +9,8 @@ namespace UselessRoles.Utility;
 
 public static class PlayerTools
 {
+    public static bool HasRole(this PlayerControl player) => ModRoleManager.AssignedRoles.ContainsKey(player.PlayerId);
+    
     public static Role GetRole(this PlayerControl player)
     {
         if (!ModRoleManager.AssignedRoles.TryGetValue(player.PlayerId, out var role))

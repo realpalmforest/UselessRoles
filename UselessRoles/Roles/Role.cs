@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 using UselessRoles.Buttons;
 using UselessRoles.Utility;
@@ -16,15 +18,22 @@ public abstract class Role
 
     public string Name { get; protected init; }
     public string Description { get; protected init; }
+    
+    public virtual void OnReceive() { }
 
-    public virtual void OnReceive()
+    public virtual void OnRoleSwitch()
     {
+        foreach (var button in GetButtons())
+            Object.Destroy(button.gameObject);
     }
 
     public virtual void OnHudStart(HudManager hud)
     {
         foreach (var player in PlayerControl.AllPlayerControls)
         {
+            if(player.isDummy)
+                continue;
+            
             // Show this player's role if they're the local player
             // or both the local player and this player are impostors
             if(player.AmOwner || (TeamType == TeamType.Impostor && player.GetRole().TeamType == TeamType))
@@ -46,9 +55,7 @@ public abstract class Role
         }
     }
 
-    public virtual void OnMeetingStart(MeetingHud meeting)
-    {
-    }
+    public virtual void OnMeetingStart(MeetingHud meeting) { }
 
     public virtual void OnMeetingEnd(MeetingHud meeting)
     {
@@ -71,7 +78,7 @@ public abstract class Role
     }
     
     
-    public static IEnumerable GetButtons()
+    public static IEnumerable<RoleActionButton> GetButtons()
     {
         Transform buttonContainer = HudManager.Instance.transform.FindChild("Buttons").FindChild("BottomRight");
         for (int i = 0; i < buttonContainer.childCount; i++)
